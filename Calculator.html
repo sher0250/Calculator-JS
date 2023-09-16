@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <!-- your meta data here -->
+ <meta name="author" content="Tanya Sherman">
+ <meta name="email" content="sher0250@algonquincollegelive.com">
+ <title>Very Simple Calculator</title>
+
+ <style>
+
+  .bodyClass, .body_dark{
+    display: flex;
+    justify-content: center;
+  }
+  .body_dark{
+    background-color: black;
+  }
+
+  #container{
+   display: grid;
+   justify-content: center;
+   align-content: center;
+   padding-top: 60px;
+   height: fit-content;
+  }
+
+  .calculator, .calculator_dark{
+   display: grid;
+   grid-template-rows: repeat(2, auto);
+   justify-content: center;
+   padding: 10px;
+   overflow: auto;
+   border-radius: 4px;
+  }
+  .calculator{
+   background:#a7c1d7;
+   box-shadow: #00000029 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  }
+  .calculator_dark{
+   background:#777777;
+   box-shadow: #00000029 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  }
+  
+  #displayTop{
+   grid-area: 1;
+   background: white;
+   height: fit-content;
+   padding: 0 5px 3px 0px;
+   text-align: right;
+  }
+  .keypad{
+   display: grid;
+   column-gap: 8px;
+   row-gap: 8px;
+   grid-template-columns: repeat(4, 30px);
+   grid-template-rows: repeat(4, auto);
+   justify-items: stretch;
+   margin: 8px 0 8px 0px;
+  }
+  button{
+   display: inline-block;
+   background: #708ea9;
+   color: aqua;
+   text-decoration: none;
+   border: none;
+   margin: 1px;
+   border-radius: 4px;
+   box-shadow: 1px 1px 3px  #34414d;
+  }
+  .button_dark{
+   display: inline-block;
+   background: #bbc1c7;
+   color: black;
+   text-decoration: none;
+   border: none;
+   margin: 1px;
+   border-radius: 4px;
+   box-shadow: 1px 1px 3px  #34414d;
+  }
+
+  button:hover{
+   color: white;
+   background: #a7c1d7;
+  }
+  .calc{
+   background: aqua;
+   color: #708ea9;
+  }
+
+  .calc_dark{
+   background: rgb(51, 51, 51);
+   color: white;
+  }
+
+  #mode{
+   height: fit-content;
+   font-size: 7pt;
+  }
+  .dark_mode{
+    background: rgb(51, 51, 51);
+    color: white;
+  }
+ </style>
+</head>
+
+<body class="bodyClass">
+ <div id="container">
+  <div id="calculator" class="calculator">
+  
+   <div id="displayTop">
+    0
+   </div>
+  
+   <div class="keypad">
+  
+    <button class="digit" onclick="clickOnNumber(7)">7</button>
+    <button class="digit" onclick="clickOnNumber(8)">8</button>
+    <button class="digit" onclick="clickOnNumber(9)">9</button>
+    <button class="calc" onclick="handleOperator('/')">&divide</button>
+    
+    
+  
+    <button class="digit" onclick="clickOnNumber(4)">4</button>
+    <button class="digit" onclick="clickOnNumber(5)">5</button>
+    <button class="digit" onclick="clickOnNumber(6)">6</button>
+    <button class="calc" onclick="handleOperator('*')">&times</button>
+  
+    <button class="digit" onclick="clickOnNumber(1)">1</button>
+    <button class="digit" onclick="clickOnNumber(2)">2</button>
+    <button class="digit" onclick="clickOnNumber(3)">3</button>
+    <button class="calc" onclick="handleOperator('-')">-</button>
+  
+    <button class="digit" onclick="clickOnNumber(0)">0</button>
+    <button class="digit" onclick="clearScreen()">C</button>
+    <button class="digit" onclick="handleOperator('=')">=</button>
+    <button class="calc" onclick="handleOperator('+')">+</button>
+
+   </div>
+   <button id="mode" onclick="modeToggle()">dark mode</button>
+  </div>
+
+ </div>
+
+ 
+</body>
+<script>
+  let $result = 0
+  let $prevOperator = ''
+  let $prevNumber = 0
+  let isFirstDigit = true
+
+  let $darkMode = true
+
+
+  function clickOnNumber(digit) {
+
+    let $display = parseInt(document.getElementById('displayTop').textContent)
+    if (isFirstDigit) {
+      document.getElementById('displayTop').textContent = digit
+      isFirstDigit = false
+    }
+    else {
+      $display = $display * 10
+      $display = $display + digit
+      document.getElementById('displayTop').textContent = $display
+    }
+
+  }
+  function clearScreen() {
+    $result = 0
+    $prevOperator = ''
+    $prevNumber = 0
+    isFirstDigit = true
+    document.getElementById('displayTop').textContent = $result
+  }
+
+  function handlePrevOperator() {
+    switch ($prevOperator) {
+      case '+':
+        $result = $result + $prevNumber
+        break;
+
+      case '-':
+        $result = $result - $prevNumber
+        break;
+
+      case '*':
+        $result = $result * $prevNumber
+        break;
+
+      case '/':
+        // preventing the program from throwing an error 
+        // when dividing by 0.
+        try {
+          if ($prevNumber == 0) throw "Nice try!"
+
+          $result = $result / $prevNumber
+        }
+        catch (err) {
+          $result = err
+        }
+        break;
+    }
+  }
+
+  function handleOperator(operator) {
+    // if we already have an operator in memory
+    if ($prevOperator != '') {
+        // remember the previous number
+        $prevNumber = parseFloat(document.getElementById('displayTop').textContent)
+        handlePrevOperator()
+
+        // if the new operator is '=' then clear the previous operators from memory.
+        if (operator == '=') {
+          $prevOperator = ''
+        }
+        // else store the new operator as prevOperator
+        else {
+          $prevOperator = operator
+        }
+    }
+    // in case we just starting a new calculation:
+    else {
+      $prevOperator = operator
+      // store what's on display in memory
+      $result = parseInt(document.getElementById('displayTop').textContent)
+    }
+    // preparing the display for the new number input
+    isFirstDigit = true
+    // displaying the result of previous operations.
+    document.getElementById('displayTop').textContent = $result
+  }
+  // Dark mode
+  function modeToggle() {
+    const $body = document.body
+    $body.classList.toggle('body_dark')
+    document.getElementById('calculator').classList.toggle('calculator_dark')
+
+    const $digits = document.getElementsByClassName('digit')
+    for (let $digit of $digits) {
+      $digit.classList.toggle('button_dark')
+    }
+
+    const $operators = document.getElementsByClassName('calc')
+    for (let $operator of $operators) {
+      $operator.classList.toggle('calc_dark')
+    }
+
+    // switches the text of the button from light to dark mode
+    if ($darkMode) {
+      document.getElementById('mode').textContent = 'light mode'
+      $darkMode = false
+    }
+    else {
+      document.getElementById('mode').textContent = 'dark mode'
+      $darkMode = true
+    }
+
+    document.getElementById('mode').classList.toggle('dark_mode')
+  }
+
+</script>
+</html>
